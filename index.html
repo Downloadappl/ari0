@@ -188,6 +188,14 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
+        .ai-header-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-left: 10px;
+        }
+        
         .menu-btn, .sidebar-toggle {
             background: none;
             border: none;
@@ -214,11 +222,52 @@
         .current-conversation-title {
             font-size: 1.1rem;
             font-weight: 500;
+            flex: 1;
+            text-align: center;
         }
         
         .header-actions {
             display: flex;
             gap: 10px;
+            position: relative;
+        }
+        
+        /* Dropdown menu styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 45px;
+            background: rgba(30, 30, 50, 0.95);
+            backdrop-filter: blur(10px);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: right;
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .dropdown:hover .dropdown-content {
+            display: block;
         }
         
         .chat-messages {
@@ -321,6 +370,7 @@
             background: rgba(255, 255, 255, 0.2);
         }
         
+        /* تعديلات على حقل الإدخال */
         .chat-input-container {
             position: fixed;
             bottom: 0;
@@ -336,52 +386,57 @@
         
         .chat-input-wrapper {
             flex: 1;
-            position: relative;
             display: flex;
             align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 5px 15px;
+            position: relative;
         }
         
         .chat-input {
             width: 100%;
-            padding: 12px 50px 12px 15px;
             border: none;
-            border-radius: 30px;
-            background: rgba(255, 255, 255, 0.1);
+            background: transparent;
             color: white;
             font-size: 1rem;
             outline: none;
-            transition: all 0.3s ease;
             resize: none;
-            min-height: 50px;
-            max-height: 150px;
+            min-height: 20px;
+            max-height: 120px;
             line-height: 1.5;
+            padding: 10px 40px 10px 10px;
         }
-        
+
         .chat-input:focus {
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 0 2px var(--accent-color);
+            box-shadow: none;
         }
-        
+
         .send-button {
-            position: absolute;
-            left: 10px;
-            bottom: 10px;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             border: none;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: absolute;
+            left: 5px;
+            bottom: 5px;
+        }
+
+        .send-button i {
+            margin: 0;
+            font-size: 1rem;
         }
         
         .send-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
         
         .send-button:disabled {
@@ -703,6 +758,10 @@
             .message {
                 max-width: 90%;
             }
+            
+            .dropdown-content {
+                left: -120px;
+            }
         }
         
         @media (max-width: 600px) {
@@ -778,11 +837,19 @@
                 <button class="sidebar-toggle" id="sidebar-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
+                <img src="https://via.placeholder.com/40/6a4c93/ffffff?text=AI" alt="الذكاء الاصطناعي" class="ai-header-image">
                 <div class="current-conversation-title" id="current-conversation-title">ASHUR CHAT</div>
                 <div class="header-actions">
-                    <button class="menu-btn" id="menu-btn">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
+                    <div class="dropdown">
+                        <button class="menu-btn" id="menu-btn">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="#" id="temporary-chat-btn">محادثة وقتية</a>
+                            <a href="#" id="export-chat-btn">تصدير المحادثة</a>
+                            <a href="#" id="delete-chat-btn">حذف المحادثة</a>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -822,7 +889,7 @@
                         <p>تفعيل الوضع الليلي تلقائياً</p>
                     </div>
                     <label class="switch">
-                        <input type="checkbox" checked>
+                        <input type="checkbox" id="night-mode-toggle" checked>
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -833,7 +900,7 @@
                         <p>تشغيل صوت عند تلقي الرسائل</p>
                     </div>
                     <label class="switch">
-                        <input type="checkbox">
+                        <input type="checkbox" id="sound-toggle">
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -844,7 +911,7 @@
                         <p>تفعيل الاهتزاز عند التنبيهات</p>
                     </div>
                     <label class="switch">
-                        <input type="checkbox" checked>
+                        <input type="checkbox" id="vibration-toggle" checked>
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -855,7 +922,7 @@
                         <p>حفظ المحادثات تلقائياً</p>
                     </div>
                     <label class="switch">
-                        <input type="checkbox" checked>
+                        <input type="checkbox" id="save-conversations-toggle" checked>
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -946,11 +1013,49 @@
             const privacyModal = document.getElementById('privacy-modal');
             const closePrivacyModal = document.getElementById('close-privacy-modal');
             const starterOptions = document.getElementById('starter-options');
+            const temporaryChatBtn = document.getElementById('temporary-chat-btn');
+            const exportChatBtn = document.getElementById('export-chat-btn');
+            const deleteChatBtn = document.getElementById('delete-chat-btn');
+            
+            // عناصر إعدادات
+            const nightModeToggle = document.getElementById('night-mode-toggle');
+            const soundToggle = document.getElementById('sound-toggle');
+            const vibrationToggle = document.getElementById('vibration-toggle');
+            const saveConversationsToggle = document.getElementById('save-conversations-toggle');
             
             // إدارة الحالة
             let conversations = JSON.parse(localStorage.getItem('ashur_conversations')) || [];
             let currentConversationId = null;
             let isTypingEffectEnabled = true;
+            let isTemporaryChat = false;
+            
+            // تهيئة الإعدادات
+            function initSettings() {
+                const settings = JSON.parse(localStorage.getItem('ashur_settings')) || {};
+                
+                nightModeToggle.checked = settings.nightMode !== undefined ? settings.nightMode : true;
+                soundToggle.checked = settings.sound || false;
+                vibrationToggle.checked = settings.vibration || true;
+                saveConversationsToggle.checked = settings.saveConversations !== undefined ? settings.saveConversations : true;
+                
+                // تطبيق الوضع الليلي
+                if (nightModeToggle.checked) {
+                    document.body.classList.add('night-mode');
+                } else {
+                    document.body.classList.remove('night-mode');
+                }
+            }
+            
+            // حفظ الإعدادات
+            function saveSettings() {
+                const settings = {
+                    nightMode: nightModeToggle.checked,
+                    sound: soundToggle.checked,
+                    vibration: vibrationToggle.checked,
+                    saveConversations: saveConversationsToggle.checked
+                };
+                localStorage.setItem('ashur_settings', JSON.stringify(settings));
+            }
             
             // تهيئة المحادثات
             function initConversations() {
@@ -982,6 +1087,25 @@
                 
                 // إظهار خيارات البدء
                 starterOptions.style.display = 'flex';
+                
+                // تعطيل وضع المحادثة الوقتية
+                isTemporaryChat = false;
+            }
+            
+            // إنشاء محادثة وقتية
+            function createTemporaryConversation() {
+                // مسح المحادثات الحالية من العرض
+                chatMessages.innerHTML = '';
+                
+                // إظهار خيارات البدء
+                starterOptions.style.display = 'flex';
+                chatMessages.appendChild(starterOptions);
+                
+                // تحديث العنوان
+                currentConversationTitle.textContent = 'محادثة وقتية';
+                
+                // تفعيل وضع المحادثة الوقتية
+                isTemporaryChat = true;
             }
             
             // إضافة محادثة إلى الشريط الجانبي
@@ -1005,6 +1129,9 @@
             
             // تحميل محادثة
             function loadConversation(conversationId) {
+                // تعطيل وضع المحادثة الوقتية
+                isTemporaryChat = false;
+                
                 currentConversationId = conversationId;
                 const conversation = conversations.find(c => c.id === conversationId);
                 
@@ -1049,7 +1176,9 @@
             
             // حفظ المحادثات في localStorage
             function saveConversations() {
-                localStorage.setItem('ashur_conversations', JSON.stringify(conversations));
+                if (saveConversationsToggle.checked) {
+                    localStorage.setItem('ashur_conversations', JSON.stringify(conversations));
+                }
             }
             
             // إضافة رسالة إلى المحادثة
@@ -1100,7 +1229,7 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
                 // حفظ الرسالة في المحادثة الحالية
-                if (saveToHistory && currentConversationId) {
+                if (saveToHistory && currentConversationId && !isTemporaryChat) {
                     const conversation = conversations.find(c => c.id === currentConversationId);
                     if (conversation) {
                         conversation.messages.push({
@@ -1312,6 +1441,71 @@
                 userInput.focus();
             };
             
+            // Function to export conversation
+            function exportConversation() {
+                if (!currentConversationId && !isTemporaryChat) return;
+                
+                let conversationData;
+                let fileName;
+                
+                if (isTemporaryChat) {
+                    // تصدير المحادثة الوقتية
+                    const messages = [];
+                    const messageElements = chatMessages.querySelectorAll('.message');
+                    
+                    messageElements.forEach(msg => {
+                        const isAI = msg.classList.contains('ai-message');
+                        const content = msg.querySelector('.message-content').textContent;
+                        messages.push({
+                            sender: isAI ? 'ai' : 'user',
+                            content: content,
+                            timestamp: new Date().toISOString()
+                        });
+                    });
+                    
+                    conversationData = {
+                        title: 'محادثة وقتية',
+                        messages: messages
+                    };
+                    
+                    fileName = 'محادثة-وقتية.json';
+                } else {
+                    // تصدير المحادثة المحفوظة
+                    const conversation = conversations.find(c => c.id === currentConversationId);
+                    if (!conversation) return;
+                    
+                    conversationData = conversation;
+                    fileName = `محادثة-${conversation.title}.json`.replace(/\s+/g, '-');
+                }
+                
+                // Create JSON file
+                const dataStr = JSON.stringify(conversationData, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = fileName;
+                link.click();
+                
+                // Clean up
+                URL.revokeObjectURL(link.href);
+            }
+            
+            // Function to delete conversation
+            function deleteConversation() {
+                if (!currentConversationId || isTemporaryChat) return;
+                
+                if (confirm('هل أنت متأكد من أنك تريد حذف هذه المحادثة؟')) {
+                    // Remove conversation from array
+                    conversations = conversations.filter(c => c.id !== currentConversationId);
+                    saveConversations();
+                    
+                    // Reload conversations
+                    initConversations();
+                }
+            }
+            
             // Event listeners
             sendButton.addEventListener('click', handleUserMessage);
             
@@ -1344,9 +1538,26 @@
             });
             
             // Menu button (ثلاث نقاط)
-            menuBtn.addEventListener('click', () => {
-                // افتح الإعدادات عند الضغط على الزر
-                settingsModal.classList.add('active');
+            menuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            // Temporary chat button
+            temporaryChatBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                createTemporaryConversation();
+            });
+            
+            // Export chat button
+            exportChatBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                exportConversation();
+            });
+            
+            // Delete chat button
+            deleteChatBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                deleteConversation();
             });
             
             // Settings modal
@@ -1356,6 +1567,7 @@
             
             closeSettingsModal.addEventListener('click', () => {
                 settingsModal.classList.remove('active');
+                saveSettings();
             });
             
             // About modal
@@ -1380,12 +1592,20 @@
             document.addEventListener('click', (e) => {
                 if (e.target === settingsModal) {
                     settingsModal.classList.remove('active');
+                    saveSettings();
                 }
                 if (e.target === aboutModal) {
                     aboutModal.classList.remove('active');
                 }
                 if (e.target === privacyModal) {
                     privacyModal.classList.remove('active');
+                }
+                
+                // إغلاق القائمة المنسدلة عند النقر خارجها
+                if (!e.target.closest('.dropdown')) {
+                    document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+                        dropdown.style.display = 'none';
+                    });
                 }
             });
             
@@ -1399,118 +1619,12 @@
             });
             
             // Initialize the app
+            initSettings();
             initConversations();
             userInput.focus();
             
             // منع اللون الأزرق عند النقر على العناصر
             document.addEventListener('touchstart', function() {}, true);
-            
-            // Initialize particles.js
-            particlesJS('particles-js', {
-                "particles": {
-                    "number": {
-                        "value": 80,
-                        "density": {
-                            "enable": true,
-                            "value_area": 800
-                        }
-                    },
-                    "color": {
-                        "value": "#f8c537"
-                    },
-                    "shape": {
-                        "type": "circle",
-                        "stroke": {
-                            "width": 0,
-                            "color": "#000000"
-                        },
-                        "polygon": {
-                            "nb_sides": 5
-                        }
-                    },
-                    "opacity": {
-                        "value": 0.5,
-                        "random": false,
-                        "anim": {
-                            "enable": false,
-                            "speed": 1,
-                            "opacity_min": 0.1,
-                            "sync": false
-                        }
-                    },
-                    "size": {
-                        "value": 3,
-                        "random": true,
-                        "anim": {
-                            "enable": false,
-                            "speed": 40,
-                            "size_min": 0.1,
-                            "sync": false
-                        }
-                    },
-                    "line_linked": {
-                        "enable": true,
-                        "distance": 150,
-                        "color": "#f8c537",
-                        "opacity": 0.4,
-                        "width": 1
-                    },
-                    "move": {
-                        "enable": true,
-                        "speed": 2,
-                        "direction": "none",
-                        "random": false,
-                        "straight": false,
-                        "out_mode": "out",
-                        "bounce": false,
-                        "attract": {
-                            "enable": false,
-                            "rotateX": 600,
-                            "rotateY": 1200
-                        }
-                    }
-                },
-                "interactivity": {
-                    "detect_on": "canvas",
-                    "events": {
-                        "onhover": {
-                            "enable": true,
-                            "mode": "grab"
-                        },
-                        "onclick": {
-                            "enable": true,
-                            "mode": "push"
-                        },
-                        "resize": true
-                    },
-                    "modes": {
-                        "grab": {
-                            "distance": 140,
-                            "line_linked": {
-                                "opacity": 1
-                            }
-                        },
-                        "bubble": {
-                            "distance": 400,
-                            "size": 40,
-                            "duration": 2,
-                            "opacity": 8,
-                            "speed": 3
-                        },
-                        "repulse": {
-                            "distance": 200,
-                            "duration": 0.4
-                        },
-                        "push": {
-                            "particles_nb": 4
-                        },
-                        "remove": {
-                            "particles_nb": 2
-                        }
-                    }
-                },
-                "retina_detect": true
-            });
         });
     </script>
 </body>
