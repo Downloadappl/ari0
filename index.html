@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>روكس - مساعد الذكاء الاصطناعي</title>
+    <title>ASHUR CHAT - مساعد الذكاء الاصطناعي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&amp;display=swap" rel="stylesheet">
     <style>
@@ -26,6 +26,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
@@ -333,9 +334,16 @@
             z-index: 50;
         }
         
-        .chat-input {
+        .chat-input-wrapper {
             flex: 1;
-            padding: 12px 15px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .chat-input {
+            width: 100%;
+            padding: 12px 50px 12px 15px;
             border: none;
             border-radius: 30px;
             background: rgba(255, 255, 255, 0.1);
@@ -343,6 +351,10 @@
             font-size: 1rem;
             outline: none;
             transition: all 0.3s ease;
+            resize: none;
+            min-height: 50px;
+            max-height: 150px;
+            line-height: 1.5;
         }
         
         .chat-input:focus {
@@ -351,18 +363,20 @@
         }
         
         .send-button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 30px;
+            position: absolute;
+            left: 10px;
+            bottom: 10px;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 100px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         
         .send-button:hover {
@@ -428,6 +442,33 @@
         
         .retry-button i {
             margin-left: 5px;
+        }
+        
+        /* خيارات البدء */
+        .starter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .starter-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+            max-width: 200px;
+            text-align: center;
+        }
+        
+        .starter-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
         }
         
         /* النوافذ المنبثقة */
@@ -499,6 +540,63 @@
         
         .modal-body p {
             margin-bottom: 15px;
+        }
+        
+        .settings-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .settings-option:last-child {
+            border-bottom: none;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
         }
         
         .developer-info {
@@ -613,12 +711,26 @@
             }
             
             .send-button {
+                position: relative;
+                margin-top: 10px;
                 width: 100%;
+                border-radius: 30px;
+                left: 0;
+                bottom: 0;
             }
             
             .modal-content {
                 width: 95%;
                 padding: 20px;
+            }
+            
+            .starter-options {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .starter-option {
+                max-width: 100%;
             }
         }
     </style>
@@ -666,7 +778,7 @@
                 <button class="sidebar-toggle" id="sidebar-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <div class="current-conversation-title" id="current-conversation-title">محادثة جديدة</div>
+                <div class="current-conversation-title" id="current-conversation-title">ASHUR CHAT</div>
                 <div class="header-actions">
                     <button class="menu-btn" id="menu-btn">
                         <i class="fas fa-ellipsis-v"></i>
@@ -675,23 +787,78 @@
             </div>
             
             <div class="chat-messages" id="chat-messages">
-                <div class="message ai-message">
-                    <div class="message-info">
-                        <i class="fas fa-robot"></i>
-                        <span>روكس AI</span>
-                    </div>
-                    <div class="message-content">
-                        مرحبًا! أنا مساعدك الذكي روكس. يمكنك سؤالي عن أي شيء وسأحاول مساعدتك بأفضل إجابة ممكنة. كيف يمكنني مساعدتك اليوم؟ 🤖✨
-                    </div>
+                <div class="starter-options" id="starter-options">
+                    <div class="starter-option" data-prompt="اكتب لي قصة قصيرة">اكتب لي قصة قصيرة</div>
+                    <div class="starter-option" data-prompt="اشرح لي نظرية النسبية">اشرح لي نظرية النسبية</div>
+                    <div class="starter-option" data-prompt="ما هي أحدث التقنيات في الذكاء الاصطناعي؟">أحدث تقنيات الذكاء الاصطناعي</div>
+                    <div class="starter-option" data-prompt="كيف أتعلم البرمجة؟">كيف أتعلم البرمجة؟</div>
                 </div>
             </div>
             
             <div class="chat-input-container">
-                <input type="text" class="chat-input" id="user-input" placeholder="اكتب سؤالك هنا..." autocomplete="off">
-                <button class="send-button" id="send-button">
-                    <i class="fas fa-paper-plane" style="margin-left: 8px;"></i>
-                    إرسال
+                <div class="chat-input-wrapper">
+                    <textarea class="chat-input" id="user-input" placeholder="اكتب سؤالك هنا..." autocomplete="off"></textarea>
+                    <button class="send-button" id="send-button">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة الإعدادات -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>الإعدادات</h2>
+                <button class="close-modal" id="close-settings-modal">
+                    <i class="fas fa-times"></i>
                 </button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-option">
+                    <div>
+                        <h3>الوضع الليلي</h3>
+                        <p>تفعيل الوضع الليلي تلقائياً</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="settings-option">
+                    <div>
+                        <h3>الصوت</h3>
+                        <p>تشغيل صوت عند تلقي الرسائل</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="settings-option">
+                    <div>
+                        <h3>الاهتزاز</h3>
+                        <p>تفعيل الاهتزاز عند التنبيهات</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="settings-option">
+                    <div>
+                        <h3>حفظ المحادثات</h3>
+                        <p>حفظ المحادثات تلقائياً</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
         </div>
     </div>
@@ -706,13 +873,13 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p>روكس هو مساعد ذكاء اصطناعي متطور يساعدك في الإجابة على أسئلتك وتقديم المساعدة في مختلف المجالات. تم تطويره باستخدام أحدث تقنيات الذكاء الاصطناعي.</p>
+                <p>ASHUR CHAT هو مساعد ذكاء اصطناعي متطور يساعدك في الإجابة على أسئلتك وتقديم المساعدة في مختلف المجالات. تم تطويره باستخدام أحدث تقنيات الذكاء الاصطناعي.</p>
                 
                 <div class="developer-info">
                     <img src="https://via.placeholder.com/60" alt="المطور">
                     <div class="developer-details">
-                        <h3>مطور التطبيق</h3>
-                        <p>مطور ويب ومصمم واجهات مستخدم</p>
+                        <h3>شركة أريكس arix</h3>
+                        <p>مطورو التطبيق</p>
                         <div class="developer-social">
                             <a href="https://t.me/QR_l4" class="social-btn" target="_blank">
                                 <i class="fab fa-telegram"></i>
@@ -741,7 +908,7 @@
             </div>
             <div class="modal-body">
                 <h3>مقدمة</h3>
-                <p>نحن في روكس نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية. توضح سياسة الخصوصية هذه كيفية جمعنا واستخدامنا ومشاركتنا لمعلوماتك.</p>
+                <p>نحن في ASHUR CHAT نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية. توضح سياسة الخصوصية هذه كيفية جمعنا واستخدامنا ومشاركتنا لمعلوماتك.</p>
                 
                 <h3>البيانات التي نجمعها</h3>
                 <p>نجمع فقط البيانات الضرورية لتقديم خدمة أفضل. لا نقوم بتخزين محتوى محادثاتك على خوادمنا بعد انتهاء الجلسة.</p>
@@ -768,16 +935,22 @@
             const chatMessages = document.getElementById('chat-messages');
             const userInput = document.getElementById('user-input');
             const sendButton = document.getElementById('send-button');
+            const menuBtn = document.getElementById('menu-btn');
+            const settingsBtn = document.getElementById('settings-btn');
+            const settingsModal = document.getElementById('settings-modal');
+            const closeSettingsModal = document.getElementById('close-settings-modal');
             const aboutBtn = document.getElementById('about-btn');
             const aboutModal = document.getElementById('about-modal');
             const closeAboutModal = document.getElementById('close-about-modal');
             const privacyBtn = document.getElementById('privacy-btn');
             const privacyModal = document.getElementById('privacy-modal');
             const closePrivacyModal = document.getElementById('close-privacy-modal');
+            const starterOptions = document.getElementById('starter-options');
             
             // إدارة الحالة
-            let conversations = JSON.parse(localStorage.getItem('conversations')) || [];
+            let conversations = JSON.parse(localStorage.getItem('ashur_conversations')) || [];
             let currentConversationId = null;
+            let isTypingEffectEnabled = true;
             
             // تهيئة المحادثات
             function initConversations() {
@@ -799,19 +972,16 @@
                 const newConversation = {
                     id: Date.now(),
                     title: 'محادثة جديدة',
-                    messages: [
-                        {
-                            sender: 'ai',
-                            content: 'مرحبًا! أنا مساعدك الذكي روكس. يمكنك سؤالي عن أي شيء وسأحاول مساعدتك بأفضل إجابة ممكنة. كيف يمكنني مساعدتك اليوم؟ 🤖✨',
-                            timestamp: new Date().toISOString()
-                        }
-                    ]
+                    messages: []
                 };
                 
                 conversations.push(newConversation);
                 saveConversations();
                 addConversationToSidebar(newConversation);
                 loadConversation(newConversation.id);
+                
+                // إظهار خيارات البدء
+                starterOptions.style.display = 'flex';
             }
             
             // إضافة محادثة إلى الشريط الجانبي
@@ -850,9 +1020,20 @@
                 
                 // عرض الرسائل
                 chatMessages.innerHTML = '';
-                conversation.messages.forEach(message => {
-                    addMessageToChat(message.sender, message.content, message.sender === 'ai', false);
-                });
+                
+                if (conversation.messages.length === 0) {
+                    // إظهار خيارات البدء للمحادثات الجديدة
+                    starterOptions.style.display = 'flex';
+                    chatMessages.appendChild(starterOptions);
+                } else {
+                    // إخفاء خيارات البدء
+                    starterOptions.style.display = 'none';
+                    
+                    // عرض جميع الرسائل
+                    conversation.messages.forEach(message => {
+                        addMessageToChat(message.sender, message.content, message.sender === 'ai', false, false);
+                    });
+                }
                 
                 // إضافة العنصر النشط إلى المحادثة الحالية
                 const conversationItems = document.querySelectorAll('.conversation-item');
@@ -868,11 +1049,14 @@
             
             // حفظ المحادثات في localStorage
             function saveConversations() {
-                localStorage.setItem('conversations', JSON.stringify(conversations));
+                localStorage.setItem('ashur_conversations', JSON.stringify(conversations));
             }
             
             // إضافة رسالة إلى المحادثة
-            function addMessageToChat(sender, message, isAI = false, isError = false, saveToHistory = true) {
+            function addMessageToChat(sender, message, isAI = false, isError = false, saveToHistory = true, enableTypingEffect = true) {
+                // إخفاء خيارات البدء
+                starterOptions.style.display = 'none';
+                
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${isAI ? 'ai-message' : 'user-message'} ${isError ? 'error-message' : ''}`;
                 
@@ -880,7 +1064,7 @@
                 messageInfoDiv.className = 'message-info';
                 messageInfoDiv.innerHTML = `
                     <i class="fas ${isAI ? 'fa-robot' : 'fa-user'}"></i>
-                    <span>${isAI ? 'روكس AI' : 'أنت'}</span>
+                    <span>${isAI ? 'ASHUR CHAT' : 'أنت'}</span>
                 `;
                 
                 const messageContentDiv = document.createElement('div');
@@ -895,6 +1079,15 @@
                             <i class="fas fa-sync-alt"></i> إعادة المحاولة
                         </button>
                     `;
+                } else if (isAI && enableTypingEffect && isTypingEffectEnabled) {
+                    // عرض مؤشر الكتابة أولاً
+                    messageContentDiv.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+                    
+                    // ثم عرض الرسالة بشكل تدريجي بعد فترة
+                    setTimeout(() => {
+                        messageContentDiv.innerHTML = formatCodeBlocks(message);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }, 1000);
                 } else {
                     // Format message with code blocks if any
                     messageContentDiv.innerHTML = formatCodeBlocks(message);
@@ -1057,13 +1250,13 @@
                 // Add user message to chat
                 addMessageToChat('user', message, false);
                 userInput.value = '';
+                userInput.style.height = 'auto';
                 
                 // Show typing indicator
                 showTypingIndicator();
                 
                 // Disable send button while waiting for response
                 sendButton.disabled = true;
-                sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
                 
                 try {
                     // Get response from API
@@ -1071,7 +1264,7 @@
                     
                     // Hide typing indicator and add AI response
                     hideTypingIndicator();
-                    addMessageToChat('ai', aiResponse, true);
+                    addMessageToChat('ai', aiResponse, true, false, true, true);
                     
                 } catch (error) {
                     // Hide typing indicator and show error message
@@ -1081,7 +1274,6 @@
                 
                 // Re-enable send button
                 sendButton.disabled = false;
-                sendButton.innerHTML = '<i class="fas fa-paper-plane" style="margin-left: 8px;"></i> إرسال';
                 userInput.focus();
             }
             
@@ -1100,7 +1292,6 @@
                 
                 // Disable send button while waiting for response
                 sendButton.disabled = true;
-                sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
                 
                 try {
                     // Get response from API
@@ -1118,17 +1309,23 @@
                 
                 // Re-enable send button
                 sendButton.disabled = false;
-                sendButton.innerHTML = '<i class="fas fa-paper-plane" style="margin-left: 8px;"></i> إرسال';
                 userInput.focus();
             };
             
             // Event listeners
             sendButton.addEventListener('click', handleUserMessage);
             
-            userInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
+            userInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
                     handleUserMessage();
                 }
+                
+                // تعديل ارتفاع حقل الإدخال تلقائياً
+                setTimeout(() => {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                }, 0);
             });
             
             // Sidebar toggle
@@ -1144,6 +1341,21 @@
             newChatBtn.addEventListener('click', () => {
                 createNewConversation();
                 sidebar.classList.remove('active');
+            });
+            
+            // Menu button (ثلاث نقاط)
+            menuBtn.addEventListener('click', () => {
+                // افتح الإعدادات عند الضغط على الزر
+                settingsModal.classList.add('active');
+            });
+            
+            // Settings modal
+            settingsBtn.addEventListener('click', () => {
+                settingsModal.classList.add('active');
+            });
+            
+            closeSettingsModal.addEventListener('click', () => {
+                settingsModal.classList.remove('active');
             });
             
             // About modal
@@ -1166,6 +1378,9 @@
             
             // Close modals when clicking outside
             document.addEventListener('click', (e) => {
+                if (e.target === settingsModal) {
+                    settingsModal.classList.remove('active');
+                }
                 if (e.target === aboutModal) {
                     aboutModal.classList.remove('active');
                 }
@@ -1174,9 +1389,21 @@
                 }
             });
             
+            // Starter options
+            document.querySelectorAll('.starter-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const prompt = option.getAttribute('data-prompt');
+                    userInput.value = prompt;
+                    handleUserMessage();
+                });
+            });
+            
             // Initialize the app
             initConversations();
             userInput.focus();
+            
+            // منع اللون الأزرق عند النقر على العناصر
+            document.addEventListener('touchstart', function() {}, true);
             
             // Initialize particles.js
             particlesJS('particles-js', {
