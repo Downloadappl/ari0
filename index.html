@@ -357,6 +357,26 @@
       box-shadow: var(--shadow);
     }
 
+    .location-buttons {
+      margin: 15px 0;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .location-btn {
+      background: var(--gradient);
+      border: none;
+      border-radius: 50px;
+      padding: 10px 20px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow);
+    }
+
     @media (max-width: 768px) {
       header {
         flex-direction: column;
@@ -378,6 +398,11 @@
       
       .stats-container {
         grid-template-columns: 1fr;
+      }
+
+      .location-buttons {
+        flex-direction: column;
+        align-items: center;
       }
     }
   </style>
@@ -423,6 +448,37 @@
             <div class="spinner"></div>
             <p>جارٍ تحديد الموقع...</p>
           </div>
+        </div>
+
+        <div id="location-error" class="error" style="display: none;">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>تعذر تحديد الموقع تلقائياً</h3>
+          <p>يرجى السماح بالوصول إلى الموقع أو اختيار مدينة يدوياً</p>
+          <div class="location-buttons">
+            <button class="location-btn" id="retry-location">
+              <i class="fas fa-refresh"></i>
+              <span>إعادة المحاولة</span>
+            </button>
+            <button class="location-btn" id="manual-location">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>اختيار مدينة يدوياً</span>
+            </button>
+          </div>
+        </div>
+        
+        <div id="city-selection" style="display: none; margin: 20px 0;">
+          <h3>اختر مدينة:</h3>
+          <select id="city-select" style="padding: 10px; border-radius: 8px; margin: 10px; background: var(--card-bg); color: var(--text-color);">
+            <option value="24.7136,46.6753">الرياض</option>
+            <option value="21.4858,39.1925">مكة</option>
+            <option value="24.467,39.611">المدينة</option>
+            <option value="21.5433,39.1728">جدة</option>
+            <option value="26.4207,50.0888">الدمام</option>
+          </select>
+          <button class="location-btn" id="confirm-city">
+            <i class="fas fa-check"></i>
+            <span>تأكيد</span>
+          </button>
         </div>
         
         <div class="current-weather">
@@ -515,6 +571,12 @@
     const body = document.body;
     const navButtons = document.querySelectorAll('.nav-btn');
     const contentSections = document.querySelectorAll('.content-section');
+    const retryLocationBtn = document.getElementById('retry-location');
+    const manualLocationBtn = document.getElementById('manual-location');
+    const citySelection = document.getElementById('city-selection');
+    const citySelect = document.getElementById('city-select');
+    const confirmCityBtn = document.getElementById('confirm-city');
+    const locationError = document.getElementById('location-error');
 
     // تحميل تفضيلات المستخدم من localStorage
     document.addEventListener('DOMContentLoaded', () => {
@@ -540,6 +602,21 @@
           document.getElementById(`${target}-content`).classList.add('active');
         });
       });
+
+      // محاولة تحديد الموقع عند تحميل الصفحة
+      getWeather();
+    });
+
+    // أحداث الأزرار الجديدة
+    retryLocationBtn.addEventListener('click', getWeather);
+    manualLocationBtn.addEventListener('click', () => {
+      citySelection.style.display = 'block';
+      locationError.style.display = 'none';
+    });
+    confirmCityBtn.addEventListener('click', () => {
+      const selectedCoords = citySelect.value.split(',');
+      getWeatherByCoords(selectedCoords[0], selectedCoords[1]);
+      citySelection.style.display = 'none';
     });
 
     // تبديل الوضع الليلي/النهاري
@@ -767,28 +844,45 @@
 
     let weatherData; // لتخزين بيانات الطقس للاستخدام في الرسوم البيانية
 
-    async function getWeather() {
+    // دالة جديدة للحصول على الطقس باستخدام الإحداثيات
+    async function getWeatherByCoords(lat, lon) {
       try {
-        // 1. جلب الموقع باستخدام IP
-        let locRes = await fetch("https://ipapi.co/json/");
-        let locData = await locRes.json();
-
-        let city = locData.city;
-        let country = locData.country_name;
-        let lat = locData.latitude;
-        let lon = locData.longitude;
-
         document.getElementById("location").innerHTML = `
-          <h2><i class="fas fa-location-dot"></i> ${city}, ${country}</h2>
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>جارٍ جلب بيانات الطقس...</p>
+          </div>
         `;
-
-        // 2. جلب بيانات الطقس من Open-Meteo
+        
+        // جلب بيانات الطقس من Open-Meteo
         let weatherRes = await fetch(
           `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&timezone=auto`
         );
+        
+        if (!weatherRes.ok) {
+          throw new Error('فشل في جلب بيانات الطقس');
+        }
+        
         weatherData = await weatherRes.json();
 
-        // الطقس الحالي
+        // الحصول على اسم المدينة باستخدام geocoding
+        let cityName = "الموقع الحالي";
+        try {
+          let geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ar`);
+          let geoData = await geoRes.json();
+          if (geoData.city) {
+            cityName = geoData.city;
+          }
+        } catch (geoError) {
+          console.log("لا يمكن الحصول على اسم المدينة", geoError);
+        }
+
+        // تحديث واجهة المستخدم
+        document.getElementById("location").innerHTML = `
+          <h2><i class="fas fa-location-dot"></i> ${cityName}</h2>
+        `;
+
+        // عرض الطقس الحالي
         let current = weatherData.current_weather;
         document.getElementById("current").innerHTML = `
           <div class="temperature-circle">
@@ -860,7 +954,8 @@
         document.getElementById("location").innerHTML = `
           <div class="error">
             <i class="fas fa-exclamation-triangle"></i>
-            <h3>تعذر تحديد الموقع أو جلب البيانات</h3>
+            <h3>تعذر جلب بيانات الطقس</h3>
+            <p>${err.message}</p>
             <p>يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى</p>
           </div>
         `;
@@ -868,7 +963,48 @@
       }
     }
 
-    getWeather();
+    // دالة تحديد الموقع الأصلية مع تحسينات
+    async function getWeather() {
+      try {
+        document.getElementById("location").innerHTML = `
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>جارٍ تحديد الموقع...</p>
+          </div>
+        `;
+        locationError.style.display = 'none';
+
+        // المحاولة الأولى: استخدام geolocation API للمتصفح
+        if (navigator.geolocation) {
+          const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              timeout: 10000,
+              maximumAge: 60000
+            });
+          });
+          
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          
+          await getWeatherByCoords(lat, lon);
+          return;
+        }
+
+        // المحاولة الثانية: استخدام خدمة IP API
+        let locRes = await fetch("https://ipapi.co/json/");
+        if (!locRes.ok) {
+          throw new Error('فشل في الحصول على الموقع من عنوان IP');
+        }
+        
+        let locData = await locRes.json();
+        await getWeatherByCoords(locData.latitude, locData.longitude);
+        
+      } catch (err) {
+        console.error("خطأ في تحديد الموقع:", err);
+        document.getElementById("location").innerHTML = "";
+        locationError.style.display = 'block';
+      }
+    }
   </script>
 </body>
 </html>
