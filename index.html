@@ -837,7 +837,6 @@
                 <button class="sidebar-toggle" id="sidebar-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <img src="https://via.placeholder.com/40/6a4c93/ffffff?text=AI" alt="الذكاء الاصطناعي" class="ai-header-image">
                 <div class="current-conversation-title" id="current-conversation-title">ASHUR CHAT</div>
                 <div class="header-actions">
                     <div class="dropdown">
@@ -852,7 +851,7 @@
                     </div>
                 </div>
             </div>
-            
+                            <img src="https://via.placeholder.com/40/6a4c93/ffffff?text=AI" alt="الذكاء الاصطناعي" class="ai-header-image">
             <div class="chat-messages" id="chat-messages">
                 <div class="starter-options" id="starter-options">
                     <div class="starter-option" data-prompt="اكتب لي قصة قصيرة">اكتب لي قصة قصيرة</div>
@@ -1328,7 +1327,7 @@
                 try {
                     // Encode the message for URL
                     const encodedMessage = encodeURIComponent(message);
-                    const apiUrl = `https://api4dev.ir/ai/?text=${encodedMessage}`;
+                    const apiUrl = `https://n-vip.x10.mx/Qwen.php?prompt=${encodedMessage}`;
                     
                     // Add timeout to the request (8 seconds as in your Python code)
                     const controller = new AbortController();
